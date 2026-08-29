@@ -30,7 +30,7 @@ A comprehensive tool that provides a safe and secure collection of all Grand The
 Select your desired GTA game from the list, click **Download**, then follow the installation wizard.
 
 The tool provides access to verified download sources with optional source code and modding resources.
-![Uploading {ECBCD3CE-9112-48B3-A101-E8D571D4AF18}.png…]()
+<img width="198" height="359" alt="{ECBCD3CE-9112-48B3-A101-E8D571D4AF18}" src="https://github.com/user-attachments/assets/efd731b2-eb63-4f7e-8a57-7cb24e87983f" />
 
 ## Example
 

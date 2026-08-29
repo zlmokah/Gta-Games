@@ -1,0 +1,1901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>GTA Games — Downloader</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #000;
+            --surface: rgba(255,255,255,.04);
+            --surface-hover: rgba(255,255,255,.08);
+            --border: rgba(255,255,255,.14);
+            --border-strong: rgba(255,255,255,.35);
+            --text: #fff;
+            --text-dim: #8a8a92;
+            --text-dimmer: #4a4a52;
+            --gold: #f5c451;
+            --primary: #f5c451;
+            --font: 'JetBrains Mono',monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font);
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        button, a {
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .ambient {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .grid-bg {
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px), linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+            background-size: 42px 42px;
+            mask-image: radial-gradient(ellipse 70% 60% at 50% 20%,black 20%,transparent 75%);
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: .45;
+            background: radial-gradient(circle,rgba(255,255,255,.09),transparent 70%);
+        }
+
+        .blob1 {
+            width: 600px;
+            height: 600px;
+            top: -200px;
+            right: -200px;
+            animation: float1 26s ease-in-out infinite;
+        }
+
+        .blob2 {
+            width: 500px;
+            height: 500px;
+            bottom: -200px;
+            left: -200px;
+            animation: float2 30s ease-in-out infinite;
+        }
+
+        @keyframes float1 {
+            0%,100% {
+                transform: translate(0,0)
+            }
+
+            50% {
+                transform: translate(-50px,60px)
+            }
+        }
+
+        @keyframes float2 {
+            0%,100% {
+                transform: translate(0,0)
+            }
+
+            50% {
+                transform: translate(50px,-40px)
+            }
+        }
+
+        .scanlines {
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient( to bottom, rgba(255,255,255,.025) 0, rgba(255,255,255,.025) 1px, transparent 1px, transparent 3px );
+            animation: scan-shift 9s linear infinite;
+        }
+
+        @keyframes scan-shift {
+            0% {
+                transform: translateY(0)
+            }
+
+            100% {
+                transform: translateY(42px)
+            }
+        }
+
+        .noise {
+            position: absolute;
+            inset: 0;
+            opacity: .04;
+            mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+
+        .wrap {
+            position: relative;
+            z-index: 1;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 0;
+            border-bottom: 1px solid var(--border);
+            gap: 10px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: .5px;
+        }
+
+            .logo::before {
+                content: ">";
+                color: var(--text-dim);
+            }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 2px;
+            background: rgba(255,255,255,.03);
+            padding: 3px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .tab-btn {
+            all: unset;
+            padding: 5px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font);
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: background .15s,color .15s;
+        }
+
+            .tab-btn:hover {
+                color: #fff;
+                background: rgba(255,255,255,.06);
+            }
+
+            .tab-btn.active {
+                background: rgba(255,255,255,.10);
+                color: #fff;
+            }
+
+        .window-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            background: var(--surface);
+            color: #fff;
+            font-family: var(--font);
+            cursor: pointer;
+            font-size: 14px;
+            transition: .15s;
+        }
+
+            .window-btn:hover {
+                background: rgba(255,255,255,.10);
+                border-color: var(--border-strong);
+            }
+
+            .window-btn.close:hover {
+                background: inherit;
+                border-color: inherit;
+                color: inherit;
+            }
+
+            .window-btn.close {
+                transition: none !important;
+            }
+
+        .download-action.pause:hover,
+        .download-action.cancel:hover {
+            transform: none !important;
+            transition: none !important;
+        }
+
+        .download-action.pause:hover {
+            background: inherit;
+            border-color: inherit;
+            color: inherit;
+        }
+
+        .download-action.cancel:hover {
+            background: inherit;
+            border-color: inherit;
+            color: inherit;
+        }
+
+        .window-btn.music.muted {
+            color: #666;
+        }
+
+        .window-btn.music {
+            padding: 0;
+        }
+
+        .speaker-icon {
+            width: 17px;
+            height: 17px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .speaker-icon svg {
+                width: 17px;
+                height: 17px;
+            }
+
+            .speaker-icon.off {
+                display: none;
+            }
+
+        .window-btn.music.muted .speaker-icon.on {
+            display: none;
+        }
+
+        .window-btn.music.muted .speaker-icon.off {
+            display: flex;
+        }
+
+        .page {
+            display: none;
+            animation: fade .15s ease;
+        }
+
+            .page.active {
+                display: block;
+            }
+
+        @keyframes fade {
+            0% {
+                opacity: .6
+            }
+
+            100% {
+                opacity: 1
+            }
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 40px 0 18px;
+            gap: 15px;
+        }
+
+            .section-title h2 {
+                font-size: 18px;
+                font-weight: 700;
+            }
+
+                .section-title h2::before {
+                    content: "> ";
+                    color: var(--text-dimmer);
+                }
+
+        .hero {
+            padding: 40px 0 20px;
+        }
+
+            .hero h1 {
+                font-size: clamp(28px,4.5vw,44px);
+                font-weight: 800;
+                line-height: 1.15;
+                margin-bottom: 12px;
+            }
+
+                .hero h1 span {
+                    color: var(--primary);
+                }
+
+            .hero p {
+                max-width: 600px;
+                color: var(--text-dim);
+                font-size: 14px;
+                line-height: 1.8;
+                margin-bottom: 24px;
+            }
+
+        .prompt {
+            color: var(--text-dimmer);
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .hero-btn {
+            padding: 12px 28px;
+            border-radius: 8px;
+            border: 1px solid var(--border-strong);
+            background: var(--surface);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .15s;
+        }
+
+            .hero-btn:hover {
+                background: var(--surface-hover);
+                transform: translateY(-2px);
+                border-color: #fff;
+            }
+
+            .hero-btn.primary {
+                background: #fff;
+                color: #000;
+                border-color: #fff;
+            }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            gap: 14px;
+        }
+
+        .game-card {
+            position: relative;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            overflow: hidden;
+            transition: border-color .15s,transform .15s;
+        }
+
+            .game-card:hover {
+                border-color: var(--border-strong);
+                transform: translateY(-3px);
+            }
+
+        .game-cover {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 3/4;
+            background-color: rgba(255,255,255,.04);
+            background-size: cover;
+            background-position: center;
+            overflow: hidden;
+        }
+
+        .game-body {
+            padding: 10px 12px 14px;
+        }
+
+        .game-title {
+            font-size: 12.5px;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 6px;
+        }
+
+        .game-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .game-size {
+            font-size: 10px;
+            color: var(--text-dim);
+        }
+
+        .dl-btn {
+            display: block;
+            width: 100%;
+            padding: 6px 0;
+            text-align: center;
+            background: #fff;
+            color: #000;
+            border: none;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            margin-top: 8px;
+            transition: .15s;
+        }
+
+            .dl-btn:hover {
+                transform: translateY(-1px);
+            }
+
+        .downloads-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+            padding-bottom: 20px;
+        }
+
+        .download-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 18px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            min-height: 100px;
+        }
+
+        .download-info {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .download-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .download-progress-bar {
+            width: 100%;
+            height: 5px;
+            background: rgba(255,255,255,.10);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+            .download-progress-bar .fill {
+                height: 100%;
+                width: 0%;
+                background: linear-gradient(90deg,#f5c451,#ffd700);
+                border-radius: 3px;
+                transition: width .18s ease;
+            }
+
+        .download-progress {
+            margin-top: 7px;
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .download-extra {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 5px;
+            font-size: 10px;
+            color: var(--text-dimmer);
+        }
+
+        .download-size {
+            min-width: 80px;
+            text-align: right;
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .download-status {
+            min-width: 82px;
+            text-align: center;
+            font-size: 10px;
+            padding: 5px 8px;
+            border-radius: 4px;
+            background: rgba(255,255,255,.06);
+            border: 1px solid var(--border);
+        }
+
+            .download-status.completed {
+                color: #4caf50;
+                border-color: #4caf50;
+            }
+
+            .download-status.downloading {
+                color: var(--gold);
+                border-color: var(--gold);
+            }
+
+            .download-status.paused {
+                color: #aaa;
+                border-color: #777;
+            }
+
+            .download-status.error {
+                color: #ff6b6b;
+                border-color: #ff6b6b;
+            }
+
+            .download-status.cancelled {
+                color: #888;
+                border-color: #555;
+            }
+
+        .download-actions {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            flex-shrink: 0;
+        }
+
+        .download-action {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: rgba(255,255,255,.04);
+            color: #fff;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: background .15s,border-color .15s,color .15s,transform .15s;
+        }
+
+            .download-action svg {
+                width: 16px;
+                height: 16px;
+                display: block;
+            }
+
+            .download-action.pause {
+                font-size: 0;
+            }
+
+            .download-action.cancel {
+                font-size: 0;
+            }
+
+            .download-action:active {
+                transform: scale(.94);
+            }
+
+            .download-action:hover {
+                background: rgba(255,255,255,.10);
+                border-color: var(--border-strong);
+            }
+
+            .download-action.cancel:hover {
+                background: rgba(255,60,60,.16);
+                border-color: #ff5555;
+                color: #ff7777;
+            }
+
+        .social-grid {
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            gap: 10px;
+            max-width: 420px;
+            margin-top: 6px;
+        }
+
+        .social-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            aspect-ratio: 1/1;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: #fff;
+            text-decoration: none;
+            transition: .15s;
+        }
+
+            .social-box svg {
+                width: 18px;
+                height: 18px;
+            }
+
+            .social-box:hover {
+                background: var(--surface-hover);
+                border-color: var(--border-strong);
+                transform: translateY(-3px);
+            }
+
+        .social-label {
+            font-size: 9.5px;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+        }
+
+            .social-label::before {
+                content: "> ";
+                color: var(--text-dimmer);
+            }
+
+        footer {
+            margin-top: 60px;
+            padding: 26px 0 40px;
+            text-align: center;
+            border-top: 1px solid var(--border);
+        }
+
+            footer p {
+                color: var(--text-dimmer);
+                font-size: 11px;
+            }
+
+        .credit {
+            margin-top: 4px;
+        }
+
+            .credit::before {
+                content: "$ ";
+            }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(8px);
+            background: rgba(255,255,255,.12);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-strong);
+            border-radius: 10px;
+            padding: 14px 28px;
+            font-family: var(--font);
+            font-size: 13px;
+            color: #fff;
+            z-index: 999;
+            opacity: 0;
+            transition: opacity .2s ease,transform .2s ease;
+            pointer-events: none;
+            white-space: pre-line;
+            max-width: calc(100vw - 40px);
+            text-align: center;
+        }
+
+            .toast.show {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+
+        @media(max-width:860px) {
+            .games-grid {
+                grid-template-columns: repeat(2,1fr);
+            }
+        }
+
+        @media(max-width:650px) {
+            .download-item {
+                flex-wrap: wrap;
+            }
+
+            .download-size {
+                text-align: left;
+                min-width: auto;
+            }
+
+            .download-status {
+                min-width: auto;
+            }
+
+            .download-actions {
+                margin-left: auto;
+            }
+        }
+
+        @media(max-width:500px) {
+            header {
+                flex-wrap: wrap;
+            }
+
+            .header-right {
+                width: 100%;
+            }
+
+            .tabs {
+                flex: 1;
+                justify-content: center;
+            }
+
+            .social-grid {
+                max-width: none;
+            }
+        }
+
+        @media(max-width:420px) {
+            .games-grid {
+                gap: 10px;
+            }
+
+            .game-body {
+                padding: 8px 8px 12px;
+            }
+
+            .wrap {
+                padding: 0 14px;
+            }
+        }
+
+        :focus-visible {
+            outline: 1px solid #fff;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="ambient">
+        <div class="grid-bg"></div>
+        <div class="blob blob1"></div>
+        <div class="blob blob2"></div>
+        <div class="scanlines"></div>
+        <div class="noise"></div>
+    </div>
+
+    <div class="wrap">
+
+        <header>
+
+            <div class="logo">GTA Games</div>
+
+            <div class="header-right">
+
+                <div class="tabs">
+
+                    <button class="tab-btn active" data-page="pageMain">
+                        Main
+                    </button>
+
+                    <button class="tab-btn" data-page="pageGames">
+                        Games
+                    </button>
+
+                    <button class="tab-btn" data-page="pageDownloads">
+                        Downloads
+                    </button>
+
+                </div>
+
+                <button id="musicButton"
+                        class="window-btn music"
+                        title="Music"
+                        aria-label="Toggle music"
+                        aria-pressed="true">
+                    <span class="speaker-icon on" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 10v4h3l4 4V6l-4 4H4Z" />
+                            <path d="M15 9.5c.8.7 1.2 1.6 1.2 2.5s-.4 1.8-1.2 2.5" />
+                            <path d="M17.7 7c1.5 1.3 2.3 3 2.3 5s-.8 3.7-2.3 5" />
+                        </svg>
+                    </span>
+                    <span class="speaker-icon off" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 10v4h3l4 4V6l-4 4H4Z" />
+                            <path d="m16 9-5 6" />
+                            <path d="m11 9 5 6" />
+                        </svg>
+                    </span>
+                </button>
+
+                <button id="closeButton"
+                        class="window-btn close"
+                        title="Close">
+                    ×
+                </button>
+
+            </div>
+
+        </header>
+
+        <div class="page active" id="pageMain">
+
+            <section class="hero">
+
+                <h1>
+                    GTA<span> Games</span>
+                </h1>
+
+                <p>
+                    <span class="prompt">$</span>
+                    All GTA games from the first release in 1997
+                    to the latest versions.
+                    Download and have fun.
+                </p>
+
+                <div class="hero-buttons">
+
+                    <button class="hero-btn primary"
+                            onclick="switchTab('pageGames')">
+                        Browse Games
+                    </button>
+
+                    <button class="hero-btn"
+                            onclick="switchTab('pageDownloads')">
+                        Downloads
+                    </button>
+
+                </div>
+
+                <div class="section-title"
+                     style="margin-top:30px;margin-bottom:14px;">
+
+                    <h2>connect</h2>
+
+                </div>
+
+                <div class="social-grid">
+
+                    <a class="social-box"
+                       href="https://www.youtube.com/@zlmokah"
+                       target="_blank"
+                       rel="noopener">
+
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.6V8.4L15.8 12l-6.2 3.6Z" />
+                        </svg>
+
+                        <span class="social-label">youtube</span>
+
+                    </a>
+
+                    <a class="social-box"
+                       href="https://t.me/hostcost"
+                       target="_blank"
+                       rel="noopener">
+
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M22.3 3.6 2.9 11.2c-1.3.5-1.3 1.3-.2 1.6l5 1.6 1.9 5.9c.2.6.4.8.9.8.4 0 .6-.2.9-.5l2.3-2.3 4.8 3.6c.9.5 1.5.2 1.7-.8L23.9 4.9c.3-1.3-.5-1.9-1.6-1.3ZM8.9 14.1l10-6.3c.5-.3.9-.1.5.3L11 15.6l-.3 3.1-1.8-4.6Z" />
+                        </svg>
+
+                        <span class="social-label">telegram</span>
+
+                    </a>
+
+                    <a class="social-box"
+                       href="https://github.com/zlmokah"
+                       target="_blank"
+                       rel="noopener">
+
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.6-4-1.6-.6-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.2 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.4-1.3-5.4-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.7 5.6-5.4 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5Z" />
+                        </svg>
+
+                        <span class="social-label">github</span>
+
+                    </a>
+
+                    <a class="social-box"
+                       href="https://discord.gg/zw8YcvhTZK"
+                       target="_blank"
+                       rel="noopener">
+
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.3 4.4A19.7 19.7 0 0 0 15.4 3c-.2.4-.5.9-.7 1.3a18.3 18.3 0 0 0-5.4 0C9.1 3.9 8.8 3.4 8.6 3a19.7 19.7 0 0 0-4.9 1.5C1 8.4.3 12.3.6 16.1a19.9 19.9 0 0 0 6 3c.5-.6.9-1.3 1.3-2-.7-.3-1.4-.6-2-1 .2-.1.3-.3.5-.4a14.2 14.2 0 0 0 12 0l.5.4c-.6.4-1.3.7-2 1 .4.7.8 1.4 1.3 2a19.9 19.9 0 0 0 6-3c.4-4.4-.7-8.3-3-11.7ZM8.7 13.6c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Zm6.6 0c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Z" />
+                        </svg>
+
+                        <span class="social-label">discord</span>
+
+                    </a>
+
+                </div>
+
+            </section>
+
+        </div>
+
+        <div class="page" id="pageGames">
+
+            <div class="section-title">
+                <h2>games</h2>
+            </div>
+
+            <div class="games-grid" id="gamesGrid"></div>
+
+        </div>
+
+        <div class="page" id="pageDownloads">
+
+            <div class="section-title">
+
+                <h2>downloads</h2>
+
+                <span style="font-size:12px;color:var(--text-dim)">
+                    Download history
+                </span>
+
+            </div>
+
+            <div class="downloads-list" id="downloadsList"></div>
+
+        </div>
+
+        <footer>
+
+            <p>All rights reserved to Zlmokah.</p>
+
+            <p class="credit">coded by PR Zlmokah</p>
+
+        </footer>
+
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+
+        const GAMES_DATA = [
+            {
+                GameName: "GTA 5 Legacy",
+                DownloadLink: "https://download192.uploadhaven.com/1/application/zip/o7S7yCzYaElmcOIvqiR3YPYFy71YVCWeYCvDACH2.zip?key=IotWDgCZMeCDqB515LWAwA&expire=1788213363&filename=GTA.5.Legacy.v2026.07.14.zip",
+                Size: "119 GB",
+                ImageLink: "https://steamunlocked.org/wp-content/uploads/2018/06/gta-5-steam-225x300.jpg"
+            },
+            {
+                GameName: "Grand San Andreas",
+                DownloadLink: "https://download191.uploadhaven.com/1/application/zip/5juqQiHkNt3Vz2Fsa5izUgCaBAd4CkTE7cO47Ux5.zip?key=f9M7wRUdzQ3Jt_u9XfbfPA&expire=1788215534&filename=GrandTheftAuto-SanAndreas.zip",
+                Size: "3.87 GB",
+                ImageLink: "https://steamunlocked.org/wp-content/uploads/2018/06/gta-sa-steam-225x300.jpg"
+            },
+            {
+                GameName: "Grand Theft Auto",
+                DownloadLink: "https://download131.uploadhaven.com/1/application/zip/6P9XoEOIPPNSMsEcJoKwrmjlfVkmCgdZquJ4yZHc.zip?key=T89KFNc9a0Bj5h4tknriPA&expire=1788051890&filename=GrandTheftAuto1997.zip",
+                Size: "365 MB",
+                ImageLink: "https://steamunlocked.org/wp-content/uploads/2022/07/Grand-Theft-Auto-Free-Download-Steam.png"
+            },
+            {
+                GameName: "Grand III (Definitive)",
+                DownloadLink: "https://download192.uploadhaven.com/1/application/zip/iUVKUovTsrmSSZT5OQFva1ltkR1ryUeO3xUmgyvQ.zip?key=Ha1Z4cojWC5M5_rydvzysQ&expire=1788225239&filename=GTA.III.Definitive.v1.112.48699928.zip",
+                Size: "4.18 GB",
+                ImageLink: "https://steamunlocked.org/wp-content/uploads/2025/03/final_cover_with_logo-239.jpg"
+            },
+            {
+                GameName: "Grand VC (Definitive)  ",
+                DownloadLink: "https://download192.uploadhaven.com/1/application/zip/3WfYQB5F6L23DN7MUe5cvSFjLxWb1EW9cw9PgONi.zip?key=Qo3tJcaOlKxN2WpnFCSyPw&expire=1788227049&filename=GTA.Vice.City.Definitive.v1.112.48699928.zip",
+                Size: "8.86 GB",
+                ImageLink: "https://steamunlocked.org/wp-content/uploads/2025/03/final_cover_with_logo-240-225x300.jpg"
+            },
+            {
+                GameName: "Grand SA (Definitive)",
+                DownloadLink: "https://download192.uploadhaven.com/1/application/zip/cmFLrcUXNeNWTgsJKmblPT7NreAvU2bL4u7v3PO9.zip?key=1ASAx7k2JACxFd1ZcqEQ0w&expire=1788227277&filename=GTA.San.Andreas.Definitive.v1.112.48699928.zip",
+                Size: "18.31 GB",
+                ImageLink: "https://steamunlocked.org/wp-content/uploads/2025/03/final_cover_with_logo-241-225x300.jpg"
+            },
+            {
+                GameName: "Grand Theft Auto IV",
+                DownloadLink: "https://download191.uploadhaven.com/1/application/zip/zakc1lowFqyKYiLwkrp8DzUYHYi2q8FfCEllzVn0fb5fbd0436bb.zip?key=W4RolK2a3fo0BA_vilUcCQ&expire=1788226467&filename=GrandTheftAutoIV.zip",
+                Size: "11.78 GB",
+                ImageLink: "https://steamunlocked.org/wp-content/uploads/2018/06/gta-4-steam-225x300.jpg"
+            },
+            {
+                GameName: "Grand Vice City",
+                DownloadLink: "https://download191.uploadhaven.com/1/application/zip/tPerrH0FJYeBKbpl49shIMoygDzlLK0r7Gg3m7Bz.zip?key=Fg3sk-HDQMFaGP1fnTFOHQ&expire=1788226820&filename=GrandTheftAuto-ViceCity.zip",
+                Size: "1.22 GB",
+                ImageLink: "https://steamunlocked.org/wp-content/uploads/2018/06/gta-vice-city-steam-225x300.jpg"
+            },
+            {
+                GameName: "Grand Theft Auto III",
+                DownloadLink: "https://download191.uploadhaven.com/1/application/zip/gDuNdvE2YAYCSRp5eY8ROAKOD00k4LxcOUDudJEK.zip?key=zB-tu9z-LyYx-YcSaMTvtg&expire=1788226011&filename=GrandTheftAutoIII.zip",
+                Size: "1.83 GB",
+                ImageLink: "https://steamunlocked.org/wp-content/uploads/2018/06/gta-3-steam-225x300.jpg"
+            },
+            {
+                GameName: "Grand Theft Auto 2",
+                DownloadLink: "https://download131.uploadhaven.com/1/application/zip/lKMI2uzT3lDArGFsAdv7bgDMH3mMYOZNhvajDu4I.zip?key=YUWaZSzIRbkwyv6Kr0IdOg&expire=1788052552&filename=GrandTheftAuto2.zip",
+                Size: "339.47 MB",
+                ImageLink: "https://steamunlocked.org/wp-content/uploads/2022/03/gta-2-steam.jpg"
+            },
+            {
+                GameName: "GTA 5 Enhanced",
+                DownloadLink: "https://download192.uploadhaven.com/1/application/zip/YVBzOuyeSoC8C8IKaYlgzmKzUKbi3l3FMJV01GTD.zip?key=dwgFtE-eniDuW9-FIKtDPQ&expire=1788216272&filename=GTA.5.Enhanced.v2026.07.14.zip",
+                Size: "94.78 GB",
+                ImageLink: "https://steamunlocked.org/wp-content/uploads/2026/08/Grand-Theft-Auto-V-Legacy-Free-Download-Steam-225x300.jpg"
+            },
+            {
+                GameName: "Grand IV (Complete Edition)",
+                DownloadLink: "https://download131.uploadhaven.com/1/application/zip/6cyPSoNT7TVdN5fjExqSDWteUJVnKGoZkLPGn1p5.zip?key=AvvRoMZ0M7jJ0X7ZtZp7sw&expire=1788054612&filename=Grand.Theft.Auto.IV.Complete.Edition.v1.2.0.59.zip",
+                Size: "19.72 GB",
+                ImageLink: "https://steamunlocked.org/wp-content/uploads/2020/04/gta-4-complete-steam-225x300.jpg"
+            }
+        ];
+
+        let GAMES = [];
+        let currentLang = "en";
+        let downloads = [];
+        let downloadId = 0;
+
+        const translations = {
+            en: {
+                no_games: "no games found",
+                downloading: "Downloading",
+                link_unavailable: "Download link not available",
+                no_downloads: "no downloads yet",
+                completed: "completed",
+                paused: "paused",
+                error: "error",
+                cancelled: "cancelled"
+            }
+        };
+
+        function switchTab(pageId) {
+
+            document.querySelectorAll(".tab-btn")
+                .forEach(b => b.classList.remove("active"));
+
+            document.querySelectorAll(".page")
+                .forEach(p => p.classList.remove("active"));
+
+            const selected =
+                document.querySelector(
+                    `.tab-btn[data-page="${pageId}"]`
+                );
+
+            if (selected)
+                selected.classList.add("active");
+
+            const page =
+                document.getElementById(pageId);
+
+            if (page)
+                page.classList.add("active");
+
+            if (pageId === "pageGames")
+                buildGames();
+
+            if (pageId === "pageDownloads")
+                renderDownloads();
+        }
+
+        function showToast(message, isGood = true) {
+
+            const toast =
+                document.getElementById("toast");
+
+            toast.textContent = message || "";
+
+            toast.style.borderColor =
+                isGood
+                    ? "rgba(255,255,255,.35)"
+                    : "#ff6b6b";
+
+            toast.classList.add("show");
+
+            clearTimeout(toast._hideTimer);
+
+            toast._hideTimer =
+                setTimeout(() => {
+                    toast.classList.remove("show");
+                }, 3500);
+        }
+
+        function formatBytes(bytes) {
+
+            if (!bytes || bytes <= 0)
+                return "0 B";
+
+            const units = ["B", "KB", "MB", "GB", "TB"];
+
+            let value = Number(bytes);
+            let index = 0;
+
+            while (
+                value >= 1024 &&
+                index < units.length - 1
+            ) {
+                value /= 1024;
+                index++;
+            }
+
+            return `${value.toFixed(2).replace(/\.?0+$/, "")} ${units[index]}`;
+        }
+
+        function parseSizeToBytes(sizeText) {
+
+            if (!sizeText)
+                return 0;
+
+            const match =
+                String(sizeText)
+                    .trim()
+                    .match(/([0-9.]+)\s*(B|KB|MB|GB|TB)/i);
+
+            if (!match)
+                return 0;
+
+            const value = parseFloat(match[1]);
+
+            const units = {
+                B: 1,
+                KB: 1024,
+                MB: 1024 ** 2,
+                GB: 1024 ** 3,
+                TB: 1024 ** 4
+            };
+
+            return Math.round(
+                value * (units[match[2].toUpperCase()] || 1)
+            );
+        }
+
+        function getGameSizeBytes(gameName) {
+
+            const game =
+                GAMES_DATA.find(
+                    g => g.GameName === gameName
+                );
+
+            return game
+                ? parseSizeToBytes(game.Size)
+                : 0;
+        }
+
+        function downloadFile(url, gameName) {
+
+            if (!url) {
+
+                showToast(
+                    translations[currentLang].link_unavailable,
+                    false
+                );
+
+                return;
+            }
+
+            if (!window.chrome?.webview) {
+
+                showToast(
+                    "WebView2 download is not available",
+                    false
+                );
+
+                return;
+            }
+
+            const id = ++downloadId;
+
+            const expectedBytes =
+                getGameSizeBytes(gameName);
+
+            const download = {
+                id: id,
+                name: gameName,
+                size: "0 B",
+                totalSize:
+                    expectedBytes > 0
+                        ? formatBytes(expectedBytes)
+                        : "Unknown",
+                remainingSize:
+                    expectedBytes > 0
+                        ? formatBytes(expectedBytes)
+                        : "Unknown",
+                speedText: "0 KB/s",
+                progress: 0,
+                status: "downloading",
+                bytesReceived: 0,
+                totalBytes: expectedBytes,
+                remaining: expectedBytes,
+                speed: 0
+            };
+
+            downloads.unshift(download);
+
+            renderDownloads();
+
+            switchTab("pageDownloads");
+
+            try {
+
+                window.chrome.webview.postMessage({
+                    type: "download",
+                    magnet: url,
+                    gameName: gameName,
+                    downloadId: id,
+                    expectedBytes: expectedBytes
+                });
+
+                showToast(
+                    `${translations[currentLang].downloading} ${gameName}`,
+                    true
+                );
+
+            } catch (error) {
+
+                download.status = "error";
+
+                renderDownloads();
+
+                showToast(
+                    "Could not start download",
+                    false
+                );
+            }
+        }
+
+        function buildGames() {
+
+            const grid =
+                document.getElementById("gamesGrid");
+
+            if (!grid)
+                return;
+
+            grid.innerHTML = "";
+
+            if (!GAMES.length) {
+
+                grid.innerHTML = `
+<div style="
+grid-column:1/-1;
+text-align:center;
+color:var(--text-dim);
+padding:40px 0;">
+${translations[currentLang].no_games}
+</div>`;
+
+                return;
+            }
+
+            GAMES.forEach(g => {
+
+                const card =
+                    document.createElement("div");
+
+                card.className = "game-card";
+
+                const cover =
+                    document.createElement("div");
+
+                cover.className = "game-cover";
+
+                if (g.ImageLink) {
+
+                    cover.style.backgroundImage =
+                        `url("${g.ImageLink}")`;
+
+                    const testImg = new Image();
+
+                    testImg.onerror = () => {
+                        cover.style.backgroundImage =
+                            "linear-gradient(#0a0a0b,#0a0a0b)";
+                    };
+
+                    testImg.src = g.ImageLink;
+                }
+
+                const body =
+                    document.createElement("div");
+
+                body.className = "game-body";
+
+                const title =
+                    document.createElement("div");
+
+                title.className = "game-title";
+                title.textContent = g.GameName;
+
+                const meta =
+                    document.createElement("div");
+
+                meta.className = "game-meta";
+
+                const size =
+                    document.createElement("span");
+
+                size.className = "game-size";
+                size.textContent = g.Size;
+
+                meta.appendChild(size);
+
+                const button =
+                    document.createElement("button");
+
+                button.className = "dl-btn";
+                button.textContent = "Download";
+
+                button.addEventListener(
+                    "click",
+                    () => {
+                        downloadFile(
+                            g.DownloadLink,
+                            g.GameName
+                        );
+                    }
+                );
+
+                body.appendChild(title);
+                body.appendChild(meta);
+                body.appendChild(button);
+
+                card.appendChild(cover);
+                card.appendChild(body);
+
+                grid.appendChild(card);
+            });
+        }
+
+        function formatTime(seconds) {
+
+            if (
+                !seconds ||
+                !isFinite(seconds) ||
+                seconds <= 0
+            )
+                return "--";
+
+            seconds = Math.floor(seconds);
+
+            const hours =
+                Math.floor(seconds / 3600);
+
+            seconds %= 3600;
+
+            const minutes =
+                Math.floor(seconds / 60);
+
+            seconds %= 60;
+
+            if (hours > 0)
+                return `${hours}h ${minutes}m`;
+
+            if (minutes > 0)
+                return `${minutes}m ${seconds}s`;
+
+            return `${seconds}s`;
+        }
+
+        function escapeHtml(text) {
+
+            const div = document.createElement("div");
+
+            div.textContent = text || "";
+
+            return div.innerHTML;
+        }
+
+        function renderDownloads() {
+
+            const container =
+                document.getElementById("downloadsList");
+
+            if (!container)
+                return;
+
+            if (!downloads.length) {
+
+                container.innerHTML = `
+<div style="
+text-align:center;
+color:var(--text-dim);
+padding:40px 0;">
+${translations[currentLang].no_downloads}
+</div>`;
+
+                return;
+            }
+
+            container.innerHTML =
+                downloads.map(d => {
+
+                    let statusText = d.status;
+
+                    if (d.status === "downloading")
+                        statusText =
+                            translations[currentLang].downloading;
+
+                    if (d.status === "completed")
+                        statusText =
+                            translations[currentLang].completed;
+
+                    if (d.status === "paused")
+                        statusText =
+                            translations[currentLang].paused;
+
+                    if (d.status === "error")
+                        statusText =
+                            translations[currentLang].error;
+
+                    if (d.status === "cancelled")
+                        statusText =
+                            translations[currentLang].cancelled;
+
+                    let eta = "--";
+
+                    if (
+                        d.status === "downloading" &&
+                        d.remaining > 0 &&
+                        d.speed > 0
+                    ) {
+                        eta =
+                            formatTime(
+                                d.remaining / d.speed
+                            );
+                    }
+
+                    const progress =
+                        Math.max(
+                            0,
+                            Math.min(
+                                100,
+                                Number(d.progress) || 0
+                            )
+                        );
+
+                    const isActive =
+                        d.status === "downloading" ||
+                        d.status === "paused";
+
+                    return `
+<div class="download-item"
+data-download-id="${d.id}">
+
+<div class="download-info">
+
+<div class="download-name">
+${escapeHtml(d.name)}
+</div>
+
+<div class="download-progress-bar">
+<div
+class="fill"
+style="width:${progress}%">
+</div>
+</div>
+
+<div class="download-progress">
+${Math.round(progress)}%
+&nbsp;•&nbsp;
+${escapeHtml(d.size)}
+/
+${escapeHtml(d.totalSize)}
+</div>
+
+<div class="download-extra">
+
+<span>
+${escapeHtml(d.remainingSize)}
+remaining
+</span>
+
+<span>
+${escapeHtml(d.speedText)}
+</span>
+
+<span>
+ETA ${eta}
+</span>
+
+</div>
+
+</div>
+
+<div class="download-size">
+${escapeHtml(d.totalSize)}
+</div>
+
+<span class="download-status ${escapeHtml(d.status)}">
+${escapeHtml(statusText)}
+</span>
+
+${isActive
+                            ? `
+<div class="download-actions">
+
+<button
+class="download-action pause"
+data-action="pause"
+data-id="${d.id}"
+title="${d.status === "paused" ? "Resume" : "Pause"}"
+aria-label="${d.status === "paused" ? "Resume" : "Pause"}">
+${d.status === "paused"
+                                ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 5 10 7-10 7V5Z"/></svg>`
+                                : `<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>`
+                            }
+</button>
+
+<button
+class="download-action cancel"
+data-action="cancel"
+data-id="${d.id}"
+title="Cancel"
+aria-label="Cancel">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 7 17 17"/><path d="M17 7 7 17"/></svg>
+</button>
+
+</div>
+`
+                            : ""
+                        }
+
+</div>
+`;
+                }).join("");
+        }
+
+        function updateDownloadStatus(
+            downloadId,
+            status,
+            progress,
+            size,
+            totalSize,
+            remainingSize,
+            speedText,
+            remaining,
+            speed,
+            bytesReceived,
+            totalBytes
+        ) {
+
+            const download =
+                downloads.find(
+                    d => d.id === Number(downloadId)
+                );
+
+            if (!download)
+                return;
+
+            if (status !== undefined)
+                download.status = status;
+
+            if (progress !== undefined)
+                download.progress = Number(progress);
+
+            if (size !== undefined)
+                download.size = size;
+
+            if (totalSize !== undefined)
+                download.totalSize = totalSize;
+
+            if (remainingSize !== undefined)
+                download.remainingSize = remainingSize;
+
+            if (speedText !== undefined)
+                download.speedText = speedText;
+
+            if (remaining !== undefined)
+                download.remaining = Number(remaining);
+
+            if (speed !== undefined)
+                download.speed = Number(speed);
+
+            if (bytesReceived !== undefined)
+                download.bytesReceived =
+                    Number(bytesReceived);
+
+            if (
+                totalBytes !== undefined &&
+                Number(totalBytes) > 0
+            ) {
+                download.totalBytes =
+                    Number(totalBytes);
+            }
+
+            renderDownloads();
+        }
+
+        function removeDownload(downloadId) {
+
+            const id = Number(downloadId);
+
+            downloads =
+                downloads.filter(
+                    d => d.id !== id
+                );
+
+            renderDownloads();
+        }
+
+        function initTabs() {
+
+            document.querySelectorAll(".tab-btn")
+                .forEach(btn => {
+
+                    btn.addEventListener(
+                        "click",
+                        () => {
+                            switchTab(
+                                btn.dataset.page
+                            );
+                        }
+                    );
+
+                });
+        }
+
+        document
+            .getElementById("downloadsList")
+            .addEventListener(
+                "click",
+                function (e) {
+
+                    const button =
+                        e.target.closest(
+                            ".download-action"
+                        );
+
+                    if (!button)
+                        return;
+
+                    const id =
+                        Number(button.dataset.id);
+
+                    const action =
+                        button.dataset.action;
+
+                    if (!window.chrome?.webview)
+                        return;
+
+                    try {
+
+                        if (action === "cancel") {
+
+                            window.chrome.webview.postMessage({
+                                type: "cancelDownload",
+                                downloadId: id
+                            });
+
+                            removeDownload(id);
+
+                            return;
+                        }
+
+                        if (action === "pause") {
+
+                            const download =
+                                downloads.find(
+                                    d => d.id === id
+                                );
+
+                            if (!download)
+                                return;
+
+                            if (download.status === "paused") {
+
+                                window.chrome.webview.postMessage({
+                                    type: "resumeDownload",
+                                    downloadId: id
+                                });
+
+                                download.status = "downloading";
+
+                            } else {
+
+                                window.chrome.webview.postMessage({
+                                    type: "pauseDownload",
+                                    downloadId: id
+                                });
+
+                                download.status = "paused";
+                            }
+
+                            renderDownloads();
+
+                        }
+
+                    } catch { }
+                }
+            );
+
+        document
+            .getElementById("musicButton")
+            .addEventListener(
+                "click",
+                function () {
+
+                    if (!window.chrome?.webview)
+                        return;
+
+                    try {
+
+                        window.chrome.webview.postMessage({
+                            type: "toggleMusic"
+                        });
+
+                    } catch { }
+
+                }
+            );
+
+        document
+            .getElementById("closeButton")
+            .addEventListener(
+                "click",
+                function () {
+
+                    if (!window.chrome?.webview)
+                        return;
+
+                    try {
+
+                        window.chrome.webview.postMessage({
+                            type: "close"
+                        });
+
+                    } catch { }
+
+                }
+            );
+
+        document.addEventListener(
+            "mousedown",
+            function (e) {
+
+                if (e.button !== 0)
+                    return;
+
+                if (
+                    e.target.closest("button") ||
+                    e.target.closest("a") ||
+                    e.target.closest("input")
+                )
+                    return;
+
+                if (window.chrome?.webview) {
+
+                    try {
+                        window.chrome.webview.postMessage("drag");
+                    } catch { }
+
+                }
+
+            }
+        );
+
+        if (window.chrome?.webview) {
+
+            window.chrome.webview.addEventListener(
+                "message",
+                function (args) {
+
+                    try {
+
+                        let data = args.data;
+
+                        if (typeof data === "string") {
+
+                            try {
+                                data = JSON.parse(data);
+                            } catch {
+                                return;
+                            }
+
+                        }
+
+                        if (!data)
+                            return;
+
+                        if (data.type === "downloadStatus") {
+
+                            showToast(
+                                data.message,
+                                data.success
+                            );
+
+                            return;
+                        }
+
+                        if (data.type === "musicState") {
+
+                            const button =
+                                document.getElementById(
+                                    "musicButton"
+                                );
+
+                            if (button) {
+
+                                button.classList.toggle(
+                                    "muted",
+                                    !data.enabled
+                                );
+
+                                button.setAttribute(
+                                    "aria-pressed",
+                                    data.enabled ? "true" : "false"
+                                );
+
+                            }
+
+                            return;
+                        }
+
+                        if (data.type === "downloadProgress") {
+
+                            if (data.status === "cancelled") {
+
+                                removeDownload(
+                                    data.downloadId
+                                );
+
+                                return;
+                            }
+
+                            updateDownloadStatus(
+                                data.downloadId,
+                                data.status,
+                                data.progress,
+                                data.size,
+                                data.totalSize,
+                                data.remainingSize,
+                                data.speedText,
+                                data.remaining,
+                                data.speed,
+                                data.bytesReceived,
+                                data.totalBytes
+                            );
+
+                        }
+
+                    } catch (e) {
+
+                        console.error(
+                            "Download message error:",
+                            e
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+        function loadGames() {
+
+            GAMES =
+                GAMES_DATA.slice();
+
+            buildGames();
+        }
+
+        loadGames();
+        initTabs();
+        renderDownloads();
+
+    </script>
+
+</body>
+</html>

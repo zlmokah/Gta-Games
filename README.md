@@ -24,19 +24,27 @@ Select your desired GTA game from the list, click **Download**, then follow the 
 The tool provides access to verified download sources with optional source code and modding resources.
 <img width="198" height="359" alt="{ECBCD3CE-9112-48B3-A101-E8D571D4AF18}" src="https://github.com/user-attachments/assets/efd731b2-eb63-4f7e-8a57-7cb24e87983f" />
 
-## Example
+## Game Collection
 
-Select:
+| Game                        | Version            |      Size | Status    |
+| --------------------------- | ------------------ | --------: | --------- |
+| GTA 5 Legacy                | 2026               |    119 GB | Available |
+| Grand San Andreas           | Original           |   3.87 GB | Available |
+| Grand Theft Auto            | Original           |    365 MB | Available |
+| Grand III (Definitive)      | Definitive Edition |   4.18 GB | Available |
+| Grand VC (Definitive)       | Definitive Edition |   8.86 GB | Available |
+| Grand SA (Definitive)       | Definitive Edition |  18.31 GB | Available |
+| Grand Theft Auto IV         | Original           |  11.78 GB | Available |
+| Grand Vice City             | Original           |   1.22 GB | Available |
+| Grand Theft Auto III        | Original           |   1.83 GB | Available |
+| Grand Theft Auto 2          | Original           | 339.47 MB | Available |
+| GTA 5 Enhanced              | 2026               |  94.78 GB | Available |
+| Grand IV (Complete Edition) | Complete Edition   |  19.72 GB | Available |
 
-`Grand Theft Auto V`
+---
 
-Choose your download folder.
+### Collection Overview
 
-Click **Download**.
+**12 Games • Multiple Versions • Complete GTA Archive**
 
-GTA Games Project provides:
-
-- Game information and version details
-- Verified download sources
-- Secure installation process
-- Modding resources and tutorials
+From the original classics to modern editions, the GTA Games Project brings the collection together in one organized place.

